@@ -18,8 +18,20 @@ string c = "$ ";
 int x,y,c_act = 1, pos_y = -1;
 char com[150];
 string comando;
+vector<string> borrados;
 
 void transformString(char a[150]);
+
+bool borrado(string x){
+    bool borrado = false;
+    for(int i = 0;i < borrados.size();i++){
+        if(borrados[i] == x){
+            borrado = true;
+            break;
+        }
+    }
+    return borrado;
+}
 
 void commands(){
     bool entro = false;
@@ -77,9 +89,11 @@ void commands(){
                     }
                     cont++;
                 }else{
-                    addstr(actual.getArchivos()[i].getNombre().c_str());
-                    addstr("   ");
-                    cont++;
+                    if(!borrado(actual.getArchivos()[i].getNombre())){
+                        addstr(actual.getArchivos()[i].getNombre().c_str());
+                        addstr("   ");
+                        cont++;
+                    }
                 }
             }else{
                 pos_y++;
@@ -109,9 +123,11 @@ void commands(){
                         }
                         cont = 0;
                 }else{
-                    addstr(actual.getArchivos()[i].getNombre().c_str());
-                    addstr("   ");
-                    cont = 0;
+                    if(!borrado(actual.getArchivos()[i].getNombre())){
+                        addstr(actual.getArchivos()[i].getNombre().c_str());
+                        addstr("   ");
+                        cont = 0;
+                    }
                 }
             }
         }
@@ -147,6 +163,7 @@ void commands(){
         for(int i = 0;i < actual.getArchivos().size();i++){
             if(actual.getArchivos()[i].getNombre() == nombre){
                 actual.getArchivos().erase(actual.getArchivos().begin() + i);
+                borrados.push_back(nombre);
                 existe = true;
                 break;
             }
@@ -175,15 +192,23 @@ void commands(){
     }else if(comm == "write"){
         string nombre, texto;
         bool valido = false;
+        bool palVal = true;
         for(int i = 0;i < arg.size();i++){
             if(arg[i] == ' '){
                 nombre = arg.substr(0, i);
                 texto = arg.substr(i+1, arg.size()-i+1);
-                valido = true;
+                for(int j = 0;j < texto.size();j++){
+                    if(texto[j] == ' '){
+                        palVal = false;
+                        break;
+                    }
+                }
+                if(palVal)
+                    valido = true;
                 break;
             }
         }
-        if(valido){
+        if(valido && !borrado(nombre)){
             fstream fw(nombre, ios::app);
             if(!fw){
                 fw.open(nombre, ios::out);
@@ -199,12 +224,14 @@ void commands(){
         string nombre = arg;
         string linea;
         fstream fr(nombre, ios::in);
-        if(fr){
-            while(fr >> linea){
-                addstr(linea.c_str());
+        if(!borrado(nombre)){
+            if(fr){
+                while(fr >> linea){
+                    addstr(linea.c_str());
+                }
+            }else{
+                addstr("El archivo no existe");
             }
-        }else{
-            addstr("El archivo no existe");
         }
     }else if(comm == "changeColor"){
         if(arg == "black"){
