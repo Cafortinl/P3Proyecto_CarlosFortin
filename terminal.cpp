@@ -167,15 +167,45 @@ void commands(){
     }else if(comm == "file"){
         string nombre = arg;
         string dir = actual.getDireccion() + "/" + nombre;
-        //fstream fw(nombre, ios::out);
-        //fw.open(nombre, ios::out);
+        fstream fw(nombre, ios::out);
+        fw.open(nombre, ios::out);
         Archivo t(nombre, dir, 2);
         actual.addArchivo(t);
         mover = false;
     }else if(comm == "write"){
-
+        string nombre, texto;
+        bool valido = false;
+        for(int i = 0;i < arg.size();i++){
+            if(arg[i] == ' '){
+                nombre = arg.substr(0, i);
+                texto = arg.substr(i+1, arg.size()-i+1);
+                valido = true;
+                break;
+            }
+        }
+        if(valido){
+            fstream fw(nombre, ios::app);
+            if(!fw){
+                fw.open(nombre, ios::out);
+                fw << texto << " ";
+            }else{
+                fw << texto << " ";
+            }
+            mover = false;
+        }else{
+            addstr("No se ingresaron los argumentos correctamente");
+        }
     }else if(comm == "read"){
-
+        string nombre = arg;
+        string linea;
+        fstream fr(nombre, ios::in);
+        if(fr){
+            while(fr >> linea){
+                addstr(linea.c_str());
+            }
+        }else{
+            addstr("El archivo no existe");
+        }
     }else if(comm == "changeColor"){
         if(arg == "black"){
             c_act = 1;
