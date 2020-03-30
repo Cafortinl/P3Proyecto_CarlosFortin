@@ -22,6 +22,57 @@ vector<string> borrados;
 
 void transformString(char a[150]);
 
+void initializeInfo(){
+    fstream ir("info.txt", ios::in);
+    if(!ir){
+    }else{
+        string linea;
+        vector<string> datos;
+        int pos = 0;
+        ir >> linea;
+        for(int i = 0;i < linea.size();i++){
+            if(linea[i] == ';'){
+                datos.push_back(linea.substr(pos, i-pos));
+                pos = i + 1;
+            }
+        }
+        datos.push_back(linea.substr(pos, linea.size()-pos));
+        pos = 0;
+        usuario = datos[0];
+        maquina = datos[1];
+        c_act = stoi(datos[2]);
+        if(datos[3] != "null"){
+            for(int j = 0;j < datos[3].size();j++){
+                if((datos[3])[j] == ','){
+                    borrados.push_back(datos[3].substr(pos, j-pos));
+                    pos = j + 1;
+                }
+            }
+            borrados.push_back(datos[3].substr(pos, datos[3].size()-pos));
+        }
+    }
+}
+
+void writeInfo(){
+    fstream iw("info.txt", ios::out);
+    if(!iw){
+        iw.open("info.txt", ios::out);
+        iw << usuario << ";" << maquina << ";" << to_string(c_act) << ";";
+        for(int i = 0;i < borrados.size();i++){
+            iw << borrados[i] << ",";
+        }
+    }else{
+        iw << usuario << ";" << maquina << ";" << to_string(c_act) << ";";
+        if(borrados.size() != 0){
+            for(int i = 0;i < borrados.size();i++){
+                iw << borrados[i] << ",";
+            }
+        }else{
+            iw << "null";
+        }
+    }
+}
+
 bool borrado(string x){
     bool borrado = false;
     for(int i = 0;i < borrados.size();i++){
@@ -260,6 +311,7 @@ void commands(){
         maquina = arg;
         mover = false;
     }else if(comm == "exit"){
+        writeInfo();
         running = false;
     }else{
         string cc = "'";
@@ -374,6 +426,7 @@ void transformString(char a[150]){
 }
 
 int main(){
+    initializeInfo();
     initscr();
     getmaxyx(stdscr,y,x);
     start_color();
