@@ -36,10 +36,10 @@ vector<Carpeta> Carpeta::getCarpetas(){
     return carpetas;
 }
 
-void Carpeta::setContenedor(Carpeta x){
+/*void Carpeta::setContenedor(Carpeta x){
     contenedor.push_back(x);
 }
 
 Carpeta Carpeta::getContenedor(){
     return contenedor[0];
-}
+}*/

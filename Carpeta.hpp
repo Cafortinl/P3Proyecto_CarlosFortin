@@ -8,7 +8,6 @@ class Carpeta : public File{
     private:
         vector<File> archivos;
         vector<Carpeta> carpetas;
-        vector<Carpeta> contenedor;
     public:
         Carpeta();
         Carpeta(string n, string d, int t);
@@ -18,6 +17,6 @@ class Carpeta : public File{
         vector<File> getArchivos();
         void addCarpeta(Carpeta x);
         vector<Carpeta> getCarpetas();
-        void setContenedor(Carpeta x);
-        Carpeta getContenedor();
+        /*void setContenedor(Carpeta x);
+        Carpeta getContenedor();*/
 };

@@ -35,3 +35,11 @@ void File::setTipo(int x){
 int File::getTipo(){
     return tipo;
 }
+
+void File::setContenedor(Carpeta* x){
+    contenedor = x;
+}
+
+Carpeta* File::getContenedor(){
+    return contenedor;
+}

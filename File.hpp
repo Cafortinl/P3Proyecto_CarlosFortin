@@ -3,10 +3,13 @@
 
 using namespace std;
 
+class Carpeta;
+
 class File{
     private:
         int tipo;
         string nombre, direccion;
+        Carpeta* contenedor;
     public:
         File();
         File(string n, string d, int t);
@@ -16,4 +19,6 @@ class File{
         string getDireccion();
         void setTipo(int x);
         int getTipo();
+        void setContenedor(Carpeta* x);
+        Carpeta* getContenedor();
 };

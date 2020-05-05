@@ -10,7 +10,7 @@ using namespace std;
 
 bool running = true;
 Carpeta root("Home", "", 1);
-Carpeta actual = root;
+Carpeta* actual = &root;
 char a = ':', b = '~', at = '@';
 string usuario = "home"; 
 string maquina = "vm_gauss";
@@ -22,6 +22,7 @@ vector<string> borrados;
 
 void transformString(char a[150]);
 
+//Method that reads the info text file, loading the user info
 void initializeInfo(){
     fstream ir("info.txt", ios::in);
     if(!ir){
@@ -53,6 +54,7 @@ void initializeInfo(){
     }
 }
 
+//Method that writes the info text file
 void writeInfo(){
     fstream iw("info.txt", ios::out);
     if(!iw){
@@ -73,6 +75,7 @@ void writeInfo(){
     }
 }
 
+//Method that evaluates if a file is deleted
 bool borrado(string x){
     bool borrado = false;
     for(int i = 0;i < borrados.size();i++){
@@ -84,6 +87,7 @@ bool borrado(string x){
     return borrado;
 }
 
+//Method that executes the commands
 void commands(){
     bool entro = false;
     bool mover = true;
@@ -110,13 +114,13 @@ void commands(){
         mover = false;
     }else if(comm == "ls"){
         int cont = 0;
-        for(int i = 0;i < actual.getArchivos().size();i++){
+        for(int i = 0;i < (*actual).getArchivos().size();i++){
             if(cont <= 6){
-                if(actual.getArchivos()[i].getTipo() == 1){
+                if((*actual).getArchivos()[i].getTipo() == 1){
                     switch(c_act){
                         case 1:{
                             attron(COLOR_PAIR(7));
-                            addstr(actual.getArchivos()[i].getNombre().c_str());
+                            addstr((*actual).getArchivos()[i].getNombre().c_str());
                             addstr("   ");
                             attroff(COLOR_PAIR(7));
                             break;
@@ -124,7 +128,7 @@ void commands(){
 
                         case 2:{
                             attron(COLOR_PAIR(8));
-                            addstr(actual.getArchivos()[i].getNombre().c_str());
+                            addstr((*actual).getArchivos()[i].getNombre().c_str());
                             addstr("   ");
                             attroff(COLOR_PAIR(8));
                             break;
@@ -132,7 +136,7 @@ void commands(){
 
                         case 3:{
                             attron(COLOR_PAIR(9));
-                            addstr(actual.getArchivos()[i].getNombre().c_str());
+                            addstr((*actual).getArchivos()[i].getNombre().c_str());
                             addstr("   ");
                             attroff(COLOR_PAIR(9));
                             break;
@@ -140,8 +144,8 @@ void commands(){
                     }
                     cont++;
                 }else{
-                    if(!borrado(actual.getArchivos()[i].getNombre())){
-                        addstr(actual.getArchivos()[i].getNombre().c_str());
+                    if(!borrado((*actual).getArchivos()[i].getNombre())){
+                        addstr((*actual).getArchivos()[i].getNombre().c_str());
                         addstr("   ");
                         cont++;
                     }
@@ -149,33 +153,33 @@ void commands(){
             }else{
                 pos_y++;
                 move(pos_y,0);
-                if(actual.getArchivos()[i].getTipo() == 1){
+                if((*actual).getArchivos()[i].getTipo() == 1){
                     switch(c_act){
                             case 1:{
                                 attron(COLOR_PAIR(7));
-                                addstr(actual.getArchivos()[i].getNombre().c_str());
+                                addstr((*actual).getArchivos()[i].getNombre().c_str());
                                 attroff(COLOR_PAIR(7));
                                 break;
                             }
 
                             case 2:{
                                 attron(COLOR_PAIR(8));
-                                addstr(actual.getArchivos()[i].getNombre().c_str());
+                                addstr((*actual).getArchivos()[i].getNombre().c_str());
                                 attroff(COLOR_PAIR(8));
                                 break;
                             }
 
                             case 3:{
                                 attron(COLOR_PAIR(9));
-                                addstr(actual.getArchivos()[i].getNombre().c_str());
+                                addstr((*actual).getArchivos()[i].getNombre().c_str());
                                 attroff(COLOR_PAIR(9));
                                 break;
                             }
                         }
                         cont = 0;
                 }else{
-                    if(!borrado(actual.getArchivos()[i].getNombre())){
-                        addstr(actual.getArchivos()[i].getNombre().c_str());
+                    if(!borrado((*actual).getArchivos()[i].getNombre())){
+                        addstr((*actual).getArchivos()[i].getNombre().c_str());
                         addstr("   ");
                         cont = 0;
                     }
@@ -185,12 +189,13 @@ void commands(){
     }else if(comm == "cd"){
         bool encontrada = false;
         string nombre = arg;
-        if(actual.getCarpetas().size() != 0){
-            for(int i = 0;i < actual.getCarpetas().size();i++){
-                if(actual.getCarpetas()[i].getNombre() == nombre)
-                    actual = actual.getCarpetas()[i];
+        if(!(*actual).getCarpetas().empty()){
+            for(int i = 0;i < (*actual).getCarpetas().size();i++){
+                if((*actual).getCarpetas()[i].getNombre() == nombre){
+                    actual = &((*actual).getCarpetas()[i]);
                     encontrada = true;
                     break;
+                }
             }
             if(encontrada){
                 mover = false;
@@ -201,9 +206,9 @@ void commands(){
             addstr("Esta carpeta esta vacia");
         }
     }else if(comm == "cd/"){
-        if(actual.getNombre() != "Home"){
-            actual = actual.getContenedor();
-            addstr(actual.getNombre().c_str());
+        if((*actual).getNombre() != "Home"){
+            actual = (*actual).getContenedor();
+            addstr((*actual).getNombre().c_str());
             mover = false;
         }else{
             addstr("Ya esta en la carpeta raiz");
@@ -211,9 +216,9 @@ void commands(){
     }else if(comm == "del"){
         string nombre = arg;
         bool existe = false;
-        for(int i = 0;i < actual.getArchivos().size();i++){
-            if(actual.getArchivos()[i].getNombre() == nombre){
-                actual.getArchivos().erase(actual.getArchivos().begin() + i);
+        for(int i = 0;i < (*actual).getArchivos().size();i++){
+            if((*actual).getArchivos()[i].getNombre() == nombre){
+                (*actual).getArchivos().erase((*actual).getArchivos().begin() + i);
                 borrados.push_back(nombre);
                 existe = true;
                 break;
@@ -226,19 +231,19 @@ void commands(){
         }
     }else if(comm == "mkdir"){
         string nombre = arg;
-        string dir = actual.getDireccion() + "/" + nombre;
+        string dir = (*actual).getDireccion() + "/" + nombre;
         Carpeta temp(nombre, dir, 1);
         temp.setContenedor(actual);
-        actual.addArchivo(temp);
-        actual.addCarpeta(temp);
+        (*actual).addArchivo(temp);
+        (*actual).addCarpeta(temp);
         mover = false;
     }else if(comm == "file"){
         string nombre = arg;
-        string dir = actual.getDireccion() + "/" + nombre;
+        string dir = (*actual).getDireccion() + "/" + nombre;
         fstream fw(nombre, ios::out);
         fw.open(nombre, ios::out);
         Archivo t(nombre, dir, 2);
-        actual.addArchivo(t);
+        (*actual).addArchivo(t);
         mover = false;
     }else if(comm == "write"){
         string nombre, texto;
@@ -330,6 +335,7 @@ void commands(){
     }
 }
 
+//Method that prints the user info
 void printInfo(){
     if(pos_y < y-1)
         pos_y++;
@@ -353,7 +359,7 @@ void printInfo(){
             addch(b);
             attroff(COLOR_PAIR(7));
             attron(COLOR_PAIR(7));
-            addstr(actual.getDireccion().c_str());
+            addstr((*actual).getDireccion().c_str());
             attroff(COLOR_PAIR(7));
             attron(COLOR_PAIR(1));
             addstr(c.c_str());
@@ -374,7 +380,7 @@ void printInfo(){
             addch(b);
             attroff(COLOR_PAIR(8));
             attron(COLOR_PAIR(8));
-            addstr(actual.getDireccion().c_str());
+            addstr((*actual).getDireccion().c_str());
             attroff(COLOR_PAIR(8));
             attron(COLOR_PAIR(2));
             addstr(c.c_str());
@@ -395,7 +401,7 @@ void printInfo(){
             addch(b);
             attroff(COLOR_PAIR(9));
             attron(COLOR_PAIR(9));
-            addstr(actual.getDireccion().c_str());
+            addstr((*actual).getDireccion().c_str());
             attroff(COLOR_PAIR(9));
             attron(COLOR_PAIR(3));
             addstr(c.c_str());
@@ -406,12 +412,14 @@ void printInfo(){
     
 }
 
+//Method that fills the character array
 void fillArray(){
     for(int i = 0;i < 150;i++){
         com[i] = '=';
     }
 }
 
+//Method that transforms the character array into string
 void transformString(char a[150]){
     comando = "";
     int pos = 0;
@@ -426,6 +434,7 @@ void transformString(char a[150]){
 }
 
 int main(){
+    root.setContenedor(&root);
     initializeInfo();
     initscr();
     getmaxyx(stdscr,y,x);
